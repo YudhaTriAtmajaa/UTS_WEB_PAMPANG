@@ -1,0 +1,50 @@
++# .htaccess - Masjid Raya Darussalam
+
+# Izinkan akses PHP
+Options -Indexes
+DirectoryIndex index.php index.html
+
+# Proteksi folder includes - tidak boleh diakses langsung
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Blok akses langsung ke /includes/
+  RewriteRule ^includes/ - [F,L]
+
+  # Blok akses langsung ke /uploads/ kecuali file gambar
+  # Perbaikan: gunakan kondisi berbasis REQUEST_FILENAME agar bekerja
+  # di root maupun subfolder hosting
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{REQUEST_FILENAME} uploads/
+  RewriteCond %{REQUEST_FILENAME} !\.(jpg|jpeg|png|webp|gif)$ [NC]
+  RewriteRule ^ - [F,L]
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Limit upload size (5MB) - support PHP 7 & PHP 8
+<IfModule mod_php.c>
+  php_value upload_max_filesize 5M
+  php_value post_max_size 8M
+  php_value max_execution_time 30
+  php_value memory_limit 128M
+</IfModule>
+<IfModule mod_php8.c>
+  php_value upload_max_filesize 5M
+  php_value post_max_size 8M
+  php_value max_execution_time 30
+  php_value memory_limit 128M
+</IfModule>
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 5M
+  php_value post_max_size 8M
+  php_value max_execution_time 30
+  php_value memory_limit 128M
+</IfModule>
+
